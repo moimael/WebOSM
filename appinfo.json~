@@ -1,0 +1,10 @@
+{
+	"id": "com.moimael.maps",
+	"version": "1.0.0",
+	"vendor": "Maël Lavault",
+	"type": "web",
+	"main": "index.html",
+	"title": "Maps",
+	"icon": "icon.png",
+	"uiRevision":2
+}
