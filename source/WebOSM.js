@@ -5,14 +5,31 @@ enyo.kind({
 		{kind: "enyo.AppMenu", components: [
 			{caption: "About", onclick: "showAboutDialog"}
 		]},
-		{kind: "enyo.PageHeader", layoutKind: "enyo.HFlexLayout", className: "enyo-header-dark", components: [
-			{flex: 1, kind: "enyo.RoundedSearchInput", name : "searchInput", onkeypress: "doSearch"},
+		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
+			{flex: 1, kind: "enyo.ToolSearchInput", name : "searchInput", onkeypress: "doSearch"},
+			{icon: "images/menu-icon-forward.png", onclick: "showToaster"}
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
 			{kind: "WebOSM.MapControl", name: "map"}
 		]},
+		
+		{kind: "Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
+			{kind: "VFlexBox", height: "100%", components: [
+				{content: "Are you sure?"},
+				{name: "rightPane", kind: "Pane", flex: 1, components: [
+				]},
+				{kind: "Toolbar", align: "center", components: [
+					{name: "dragHandle", kind: "GrabButton", onclick: "close"}
+				]}
+			]}
+		]},
+		
 		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"}
 	],
+	
+	showToaster: function() {
+    this.$.toaster.open();
+},
 	
 	doSearch: function(inSender, inEvent){
 		var kc = inEvent.keyCode;
