@@ -7,18 +7,18 @@ enyo.kind({
 			{caption: "About", onclick: "showAboutDialog"}
 		]},
 		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
-			{icon: "images/menu-icon-forward.png", onclick: "showLocation"},
+			{icon: "images/menu-icon-mylocation.png", onclick: "showLocation"},
 			{flex: 1, kind: "enyo.ToolSearchInput", name : "searchInput", onkeypress: "doSearch"},
-			{kind: "RadioToolButtonGroup", name: "myGroup", onclick: "myGroupClick",
-      components: [
-          {icon: "images/facebook-32x32.png",
-              value: "facebook"},
-          {icon: "images/gmail-32x32.png",
-              value: "gmail"},
-          {icon: "images/yahoo-32x32.png",
-              value: "yahoo"}
-      ]
-  }
+//			{kind: "RadioToolButtonGroup", name: "myGroup", onclick: "myGroupClick",
+//      components: [
+//          {icon: "images/facebook-32x32.png",
+//              value: "facebook"},
+//          {icon: "images/gmail-32x32.png",
+//              value: "gmail"},
+//          {icon: "images/yahoo-32x32.png",
+//              value: "yahoo"}
+//      ]
+//  }
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
 			{kind: "WebOSM.MapControl", name: "map"}
@@ -66,7 +66,8 @@ enyo.kind({
 		
 		var markerLocation = new L.LatLng(latitude, longitude);
 		var marker = new L.Marker(markerLocation);
-		this.$.map.getMap().addLayer(marker).setView(markerLocation, 16);
+		this.$.map.getMap().addLayer(marker);
+		this.$.map.getMap().setView(markerLocation, 16);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
 	},
 	
