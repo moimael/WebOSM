@@ -2,12 +2,23 @@ enyo.kind({
 	name: "WebOSM",
 	kind: "enyo.VFlexBox",
 	components: [
+		{kind: "ApplicationEvents", onLoad: "showLocation"},
 		{kind: "enyo.AppMenu", components: [
 			{caption: "About", onclick: "showAboutDialog"}
 		]},
 		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
+			{icon: "images/menu-icon-forward.png", onclick: "showLocation"},
 			{flex: 1, kind: "enyo.ToolSearchInput", name : "searchInput", onkeypress: "doSearch"},
-			{icon: "images/menu-icon-forward.png", onclick: "showToaster"}
+			{kind: "RadioToolButtonGroup", name: "myGroup", onclick: "myGroupClick",
+      components: [
+          {icon: "images/facebook-32x32.png",
+              value: "facebook"},
+          {icon: "images/gmail-32x32.png",
+              value: "gmail"},
+          {icon: "images/yahoo-32x32.png",
+              value: "yahoo"}
+      ]
+  }
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
 			{kind: "WebOSM.MapControl", name: "map"}
@@ -15,7 +26,8 @@ enyo.kind({
 		
 		{kind: "Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
 			{kind: "VFlexBox", height: "100%", components: [
-				{content: "Are you sure?"},
+				{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
+				]},
 				{name: "rightPane", kind: "Pane", flex: 1, components: [
 				]},
 				{kind: "Toolbar", align: "center", components: [
@@ -42,19 +54,23 @@ enyo.kind({
 	},
 	
 	gotLocation: function(inSender, inResponse, inRequest) {
-		this.results = inResponse;
-		var latitude = this.results.ResultSet.Results[0].latitude;
-		var longitude = this.results.ResultSet.Results[0].longitude;
-		var city = this.results.ResultSet.Results[0].city;
-		var country = this.results.ResultSet.Results[0].country;
-		var county = this.results.ResultSet.Results[0].county;
-		var countycode = this.results.ResultSet.Results[0].countycode;
-		var state = this.results.ResultSet.Results[0].state;
-		var uzip = this.results.ResultSet.Results[0].uzip;
+		this.results = inResponse.ResultSet.Results;
+		var latitude = this.results[0].latitude;
+		var longitude = this.results[0].longitude;
+		var city = this.results[0].city;
+		var country = this.results[0].country;
+		var county = this.results[0].county;
+		var countycode = this.results[0].countycode;
+		var state = this.results[0].state;
+		var uzip = this.results[0].uzip;
 		
 		var markerLocation = new L.LatLng(latitude, longitude);
 		var marker = new L.Marker(markerLocation);
 		this.$.map.getMap().addLayer(marker).setView(markerLocation, 16);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
+	},
+	
+	showLocation: function() {
+		this.$.map.getMap().locateAndSetView(16);
 	}
 });

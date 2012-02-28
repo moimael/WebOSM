@@ -20,7 +20,7 @@ enyo.kind({
 //		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
 
 		// add the CloudMade layer to the map set the view to a given center and zoom
-		map.addLayer(cloudmade);
+		map.addLayer(cloudmade).setView(new L.LatLng(51.505, -0.09), 3);
 		
 		map.on('locationfound', function(e) {
 			var radius = e.accuracy / 2;
@@ -34,9 +34,10 @@ enyo.kind({
 		});
 		
 		map.on('locationerror', function(e) { 
-			alert(e.message);
+			this.dialog = new WebOSM.Dialog;
+			this.dialog.showDialog();
+			this.dialog.setCaption("Location not found");
+			this.dialog.setContent("Unable to find your location, would you like to retry ?");
 		});
-		
-		map.locateAndSetView(16);
 	}
 });
