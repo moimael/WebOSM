@@ -18,7 +18,7 @@ enyo.kind({
 //  }
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
-			{kind: "WebOSM.MapControl", name: "map"}
+			{kind: "WebOSM.MapControl", name: "map", credentials: "8c92938a1540489f822ce0ade39e7acc"}
 		]},
 		
 		{kind: "Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
@@ -63,12 +63,12 @@ enyo.kind({
 		
 		var markerLocation = new L.LatLng(latitude, longitude);
 		var marker = new L.Marker(markerLocation);
-		this.$.map.getMap().addLayer(marker);
-		this.$.map.getMap().setView(markerLocation, 16);
+		this.$.map.hasMap().addLayer(marker);
+		this.$.map.hasMap().setView(markerLocation, 16);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
 	},
 	
 	showLocation: function() {
-		this.$.map.getMap().locateAndSetView(16);
+		this.$.map.hasMap().locateAndSetView(16);
 	}
 });
