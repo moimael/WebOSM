@@ -35,12 +35,8 @@ enyo.kind({
 				map.addLayer(circle);
 			}
 		});
-		
-		map.on('locationerror', function(e) { 
-			this.dialog = new WebOSM.Dialog;
-			this.dialog.showDialog();
-			this.dialog.setCaption("Location not found");
-			this.dialog.setContent("Unable to find your location, would you like to retry ?");
+		map.on('locationerror', function(e) {
+			enyo.windows.addBannerMessage("Unable to find your location", '{}');
 		});
 	}
 });

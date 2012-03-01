@@ -11,12 +11,9 @@ enyo.kind({
 			{flex: 1, kind: "enyo.ToolSearchInput", name : "searchInput", onkeypress: "doSearch"},
 //			{kind: "RadioToolButtonGroup", name: "myGroup", onclick: "myGroupClick",
 //      components: [
-//          {icon: "images/facebook-32x32.png",
-//              value: "facebook"},
-//          {icon: "images/gmail-32x32.png",
-//              value: "gmail"},
-//          {icon: "images/yahoo-32x32.png",
-//              value: "yahoo"}
+//          {kind: "RadioToolButton", className: "enyo-grouped-toolbutton-dark", icon: "images/facebook-32x32.png"},
+//          {kind: "RadioToolButton", className: "enyo-grouped-toolbutton-dark", icon: "images/gmail-32x32.png"},
+//          {kind: "RadioToolButton",className: "enyo-grouped-toolbutton-dark", icon: "images/yahoo-32x32.png"}
 //      ]
 //  }
 		]},
@@ -40,7 +37,7 @@ enyo.kind({
 	],
 	
 	showToaster: function() {
-    this.$.toaster.open();
+		this.$.toaster.open();
 },
 	
 	doSearch: function(inSender, inEvent){
