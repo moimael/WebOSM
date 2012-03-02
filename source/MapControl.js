@@ -20,7 +20,14 @@ enyo.kind({
 
 		// add the CloudMade layer to the map set the view to a given center and zoom
 		this.map.addLayer(cloudmade).setView(new L.LatLng(51.505, -0.09), 3);
-		
+		this.connectEvents();
+	},
+	
+	hasMap: function() {
+		return this.map;
+	},
+	
+	connectEvents: function() {
 		var marker;
 		var circle;
 		map = this.map;
@@ -38,9 +45,5 @@ enyo.kind({
 		this.map.on('locationerror', function(e) {
 			enyo.windows.addBannerMessage("Unable to find your location", '{}');
 		});
-	},
-	
-	hasMap: function() {
-		return this.map;
-	},
+	}
 });
