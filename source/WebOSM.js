@@ -4,6 +4,7 @@ enyo.kind({
 	components: [
 		{kind: "ApplicationEvents", onLoad: "showLocation"},
 		{kind: "enyo.AppMenu", components: [
+			{kind: "EditMenu"},
 			{caption: "About", onclick: "showAboutDialog"}
 		]},
 		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
@@ -33,7 +34,8 @@ enyo.kind({
 			]}
 		]},
 		
-		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"}
+		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"},
+		{name: "aboutDialog", kind: "WebOSM.AboutDialog"}
 	],
 	
 	showToaster: function() {
@@ -62,13 +64,19 @@ enyo.kind({
 		var uzip = this.results[0].uzip;
 		
 		var markerLocation = new L.LatLng(latitude, longitude);
+		
 		var marker = new L.Marker(markerLocation);
 		this.$.map.hasMap().addLayer(marker);
-		this.$.map.hasMap().setView(markerLocation, 16);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
+		
+		this.$.map.hasMap().setView(markerLocation, 16);
 	},
 	
 	showLocation: function() {
 		this.$.map.hasMap().locateAndSetView(16);
+	},
+	
+	showAboutDialog: function() {
+		this.$.aboutDialog.showDialog();
 	}
 });
