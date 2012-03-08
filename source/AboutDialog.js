@@ -14,7 +14,7 @@ enyo.kind({
 	
 	showDialog: function() {
 		this.openAtCenter();
-		var attribution = "WebOSM is distributed under the terms of <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a><br/>Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a><br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a><br/>Copyright © 2012 Maël Lavault<br/><br/>";
+		var attribution = "WebOSM is distributed under the terms of <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a> license<br/>Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a><br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a><br/>Leaflet is distributed under the terms of BSD license<br/>Some images are distributed under the terms of Apache license<br/>Copyright © 2012 Maël Lavault<br/><br/>";
 
 		this.$.content.setContent(attribution);
 	},
