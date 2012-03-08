@@ -2,54 +2,99 @@ enyo.kind({
 	name: "WebOSM",
 	kind: "enyo.VFlexBox",
 	components: [
-		{kind: "ApplicationEvents", onLoad: "showLocation"},
+		{kind: "enyo.ApplicationEvents", onLoad: "showLocation"},
 		{kind: "enyo.AppMenu", components: [
-			{kind: "EditMenu"},
+			{kind: "enyo.EditMenu"},
 			{caption: "About", onclick: "showAboutDialog"}
 		]},
 		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
+			{name: "searchType", kind: "enyo.RadioToolButtonGroup", onChange: "searchTypeChanged",
+				components: [
+					{kind: "enyo.RadioToolButton", icon: "images/topbar-search-icon.png", className: "enyo-grouped-toolbutton-dark"},
+					{kind: "enyo.RadioToolButton", icon: "images/topbar-direct-icon.png", className: "enyo-grouped-toolbutton-dark"}
+				]
+			},
 			{icon: "images/menu-icon-mylocation.png", onclick: "showLocation"},
-			{flex: 1, kind: "enyo.ToolSearchInput", name : "searchInput", onkeypress: "doSearch"},
-//			{kind: "RadioToolButtonGroup", name: "myGroup", onclick: "myGroupClick",
-//      components: [
-//          {kind: "RadioToolButton", className: "enyo-grouped-toolbutton-dark", icon: "images/facebook-32x32.png"},
-//          {kind: "RadioToolButton", className: "enyo-grouped-toolbutton-dark", icon: "images/gmail-32x32.png"},
-//          {kind: "RadioToolButton",className: "enyo-grouped-toolbutton-dark", icon: "images/yahoo-32x32.png"}
-//      ]
-//  }
+			{name: "searchInput", kind: "enyo.ToolSearchInput", flex: 1, onkeypress: "searchInputKeypress"},
+			{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: "Start point", showing: false},
+			{name: "switchInputIcon", icon: "images/menu-icon-swap.png", onclick: "switchInputsContent", showing: false},
+			{name: "endPointInput", kind: "enyo.ToolInput", flex: 4, hint: "End point", showing: false},
+			{name: "routingOkButton", kind: "enyo.Button", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "doRouting"}
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
-			{kind: "WebOSM.MapControl", name: "map", credentials: "8c92938a1540489f822ce0ade39e7acc"}
+			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc"}
 		]},
 		
-		{kind: "Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
-			{kind: "VFlexBox", height: "100%", components: [
+		{kind: "enyo.Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
+			{kind: "enyo.VFlexBox", height: "100%", components: [
 				{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
 				]},
-				{name: "rightPane", kind: "Pane", flex: 1, components: [
+				{name: "rightPane", kind: "enyo.Pane", flex: 1, components: [
 				]},
-				{kind: "Toolbar", align: "center", components: [
-					{name: "dragHandle", kind: "GrabButton", onclick: "close"}
+				{kind: "enyo.Toolbar", align: "center", components: [
+					{name: "dragHandle", kind: "enyo.GrabButton", onclick: "close"}
 				]}
 			]}
 		]},
 		
 		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"},
+		{name: "getLocationStart", kind: "enyo.WebService", onSuccess: "gotLocationStart", onFailure: "gotLocationStartFailure"},
+		{name: "getLocationEnd", kind: "enyo.WebService", onSuccess: "gotLocationEnd", onFailure: "gotLocationEndFailure"},
+		{name: "getRouting", kind: "enyo.WebService", onSuccess: "gotRouting", onFailure: "gotRoutingFailure"},
 		{name: "aboutDialog", kind: "WebOSM.AboutDialog"}
 	],
 	
+	create: function() {
+		this.inherited(arguments);
+		this.locations = [];
+	},
+	
+	searchTypeChanged: function(inSender) {
+		if(inSender.getValue() == 0){
+			this.$.startPointInput.hide();
+			this.$.switchInputIcon.hide();
+			this.$.endPointInput.hide();
+			this.$.routingOkButton.hide();
+			this.$.searchInput.show();
+		}
+		else {
+			this.$.startPointInput.show();
+			this.$.switchInputIcon.show();
+			this.$.endPointInput.show();
+			this.$.routingOkButton.show();
+			this.$.searchInput.hide();
+		}
+	},
+	
+	switchInputsContent: function(){
+		var tmp = this.$.endPointInput.getValue();
+		this.$.endPointInput.setValue(this.$.startPointInput.getValue());
+		this.$.startPointInput.setValue(tmp);
+		
+	},
+	
 	showToaster: function() {
 		this.$.toaster.open();
-},
+	},
 	
-	doSearch: function(inSender, inEvent){
-		var kc = inEvent.keyCode;
-		if (kc == 13) {
-			var location = this.$.searchInput.getValue();
-			this.$.getLocation.setUrl("http://where.yahooapis.com/geocode?location=" + location + "&flags=J&appid=fTGKVi5e");
-			this.$.getLocation.call();
-			return;
+	searchInputKeypress: function(inSender, inEvent) {
+		if (inEvent.keyCode == 13) {
+			this.doSearch();
 		}
+	},
+
+	doSearch: function(){
+			this.$.map.clearAll();
+			var location = this.$.searchInput.getValue();
+			if (location){
+				this.findLocation(location);
+				return;
+			}
+	},
+	
+	findLocation: function(location) {
+ 		this.$.getLocation.setUrl("http://where.yahooapis.com/geocode?location=" + location + "&flags=J&appid=fTGKVi5e");
+		this.$.getLocation.call();
 	},
 	
 	gotLocation: function(inSender, inResponse, inRequest) {
@@ -66,10 +111,45 @@ enyo.kind({
 		var markerLocation = new L.LatLng(latitude, longitude);
 		
 		var marker = new L.Marker(markerLocation);
-		this.$.map.hasMap().addLayer(marker);
+		this.$.map.hasLayers().addLayer(marker);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
 		
 		this.$.map.hasMap().setView(markerLocation, 16);
+	},
+	
+	gotLocationStart: function(inSender, inResponse, inRequest) {
+		this.results = inResponse.ResultSet.Results;
+		var latlng = new L.LatLng(this.results[0].latitude, this.results[0].longitude);
+		this.locations.push(latlng);
+		this.test();
+	},
+	
+	gotLocationEnd: function(inSender, inResponse, inRequest) {
+		this.results = inResponse.ResultSet.Results;
+		var latlng = new L.LatLng(this.results[0].latitude, this.results[0].longitude);
+		this.locations.push(latlng);
+		this.test();
+	},
+	
+	gotRouting: function(inSender, inResponse, inRequest) {
+		this.results = inResponse.route_geometry;
+		var latlngs = [];
+		var test = [];
+		for(i = 0; i < this.results.length - 1; i++){
+			test.push(new L.LatLng(this.results[i]['0'], this.results[i]['1']));
+			test.push(new L.LatLng(this.results[i+1]['0'], this.results[i+1]['1']));
+			latlngs.push(test);
+			test = [];
+		}
+
+		// create a blue MultiPolyline from an arrays of LatLng points
+		var mpolyline = new L.MultiPolyline(latlngs);
+		
+		// zoom the map to the MultiPolyline
+		this.$.map.hasMap().fitBounds(new L.LatLngBounds(latlngs['0']['0'], latlngs[latlngs.length - 1]['0']));
+		
+		// add the polyline to the map
+		this.$.map.hasLayers().addLayer(mpolyline);
 	},
 	
 	showLocation: function() {
@@ -78,5 +158,27 @@ enyo.kind({
 	
 	showAboutDialog: function() {
 		this.$.aboutDialog.showDialog();
+	},
+	
+	doRouting: function() {
+		this.$.map.clearAll();
+		var startPoint = this.$.startPointInput.getValue();
+		var endPoint = this.$.endPointInput.getValue();
+		
+		if(startPoint && endPoint){
+			this.$.getLocationStart.setUrl("http://where.yahooapis.com/geocode?location=" + startPoint + "&flags=J&appid=fTGKVi5e");
+			this.$.getLocationStart.call();
+			this.$.getLocationEnd.setUrl("http://where.yahooapis.com/geocode?location=" + endPoint + "&flags=J&appid=fTGKVi5e");
+			this.$.getLocationEnd.call();
+		}
+	},
+	
+	test: function(){
+		if(this.locations.length == 2){
+			enyo.windows.addBannerMessage(this.locations ,'{}');
+			this.$.getRouting.setUrl("http://routes.cloudmade.com/8c92938a1540489f822ce0ade39e7acc/api/0.3/" + this.locations[0].lat + "," + this.locations[0].lng + "," + this.locations[1].lat + "," + this.locations[1].lng + "/car.js?lang=fr&units=km");
+			this.$.getRouting.call();
+			this.locations = [];
+		}
 	}
 });
