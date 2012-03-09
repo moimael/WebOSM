@@ -72,18 +72,18 @@ enyo.kind({
 	},
 	
 	gotLocationError: function(e) {
-			enyo.windows.addBannerMessage("Unable to find your location", '{}');
+			enyo.windows.addBannerMessage($L("Unable to find your location"), '{}');
 	},
 	
 	gotLocation: function(e) {
 			if (typeof marker == 'undefined' && typeof circle == 'undefined'){
 				var radius = e.accuracy / 2;
 				var marker = new L.Marker(e.latlng);
-				this.map.addLayer(marker);
-				marker.bindPopup("You are within " + radius + " meters from this point").openPopup();
+				this.layerGroup.addLayer(marker);
+				marker.bindPopup($L("You are within ") + radius + $L(" meters from this point")).openPopup();
 
 				var circle = new L.Circle(e.latlng, radius);
-				this.map.addLayer(circle);
+				this.layerGroup.addLayer(circle);
 			}
 	}
 });

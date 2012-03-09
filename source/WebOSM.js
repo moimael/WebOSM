@@ -5,7 +5,7 @@ enyo.kind({
 		{kind: "enyo.ApplicationEvents", onLoad: "showLocation"},
 		{kind: "enyo.AppMenu", components: [
 			{kind: "enyo.EditMenu"},
-			{caption: "About", onclick: "showAboutDialog"}
+			{caption: $L("About"), onclick: "showAboutDialog"}
 		]},
 		{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
 			{name: "searchType", kind: "enyo.RadioToolButtonGroup", onChange: "searchTypeChanged",
@@ -16,10 +16,10 @@ enyo.kind({
 			},
 			{icon: "images/menu-icon-mylocation.png", onclick: "showLocation"},
 			{name: "searchInput", kind: "enyo.ToolSearchInput", flex: 1, onkeypress: "searchInputKeypress"},
-			{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: "Start point", showing: false},
+			{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("Start point"), showing: false},
 			{name: "switchInputIcon", icon: "images/menu-icon-swap.png", onclick: "switchInputsContent", showing: false},
-			{name: "endPointInput", kind: "enyo.ToolInput", flex: 4, hint: "End point", showing: false},
-			{name: "routingOkButton", kind: "enyo.Button", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "doRouting"}
+			{name: "endPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("End point"), showing: false},
+			{name: "routingOkButton", kind: "enyo.ActivityButton", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "doRouting"}
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
 			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc"}
@@ -46,6 +46,8 @@ enyo.kind({
 	
 	create: function() {
 		this.inherited(arguments);
+		var currentLocale = new enyo.g11n.currentLocale();
+		this.localeLanguage = currentLocale.getLanguage();
 		this.locations = [];
 	},
 	
@@ -150,10 +152,12 @@ enyo.kind({
 		
 		// add the polyline to the map
 		this.$.map.hasLayers().addLayer(mpolyline);
+		this.$.routingOkButton.setActive(false);
+		this.$.routingOkButton.setDisabled(false);
 	},
 	
 	showLocation: function() {
-		this.$.map.hasMap().locateAndSetView(16);
+		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
 	
 	showAboutDialog: function() {
@@ -161,6 +165,8 @@ enyo.kind({
 	},
 	
 	doRouting: function() {
+		this.$.routingOkButton.setActive(true);
+		this.$.routingOkButton.setDisabled(true);
 		this.$.map.clearAll();
 		var startPoint = this.$.startPointInput.getValue();
 		var endPoint = this.$.endPointInput.getValue();
@@ -175,8 +181,7 @@ enyo.kind({
 	
 	test: function(){
 		if(this.locations.length == 2){
-			enyo.windows.addBannerMessage(this.locations ,'{}');
-			this.$.getRouting.setUrl("http://routes.cloudmade.com/8c92938a1540489f822ce0ade39e7acc/api/0.3/" + this.locations[0].lat + "," + this.locations[0].lng + "," + this.locations[1].lat + "," + this.locations[1].lng + "/car.js?lang=fr&units=km");
+			this.$.getRouting.setUrl("http://routes.cloudmade.com/8c92938a1540489f822ce0ade39e7acc/api/0.3/" + this.locations[0].lat + "," + this.locations[0].lng + "," + this.locations[1].lat + "," + this.locations[1].lng + "/car.js?lang=" + this.localeLanguage + "&units=km");
 			this.$.getRouting.call();
 			this.locations = [];
 		}
