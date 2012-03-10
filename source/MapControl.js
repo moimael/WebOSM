@@ -15,7 +15,8 @@ enyo.kind({
 	name: "WebOSM.MapControl", 
 	kind: "enyo.Control",
 	published: {
-		credentials: ""
+		credentials: "",
+		mapType: "road"
 	},
 	create: function() {
 		this.inherited(arguments);
@@ -44,14 +45,23 @@ enyo.kind({
 		}
 		
 		// create a CloudMade tile layer
-		var cloudmade = new L.TileLayer('http://{s}.tile.cloudmade.com/' + this.credentials + '/997/256/{z}/{x}/{y}.png', {
+		var cloudMade = new L.TileLayer('http://{s}.tile.cloudmade.com/' + this.credentials + '/997/256/{z}/{x}/{y}.png', {
 			maxZoom: 18
 		});
+		var openAerials = new L.TileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
+			maxZoom: 18, subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
+		});
+		
+		this.baseMaps = {
+			"road": cloudMade,
+			"satellite": openAerials
+		};
 
 		// add the CloudMade layer to the map and set the view to a given center
-		this.map.addLayer(cloudmade).setView(new L.LatLng(51.505, -0.09), 3);
+		this.map.addLayer(cloudMade).setView(new L.LatLng(51.505, -0.09), 3);
 		this.map.addLayer(this.layerGroup);
 		this.connectEvents();
+		this.mapTypeChanged();
 	},
 	
 	hasMap: function() {
@@ -85,5 +95,17 @@ enyo.kind({
 				var circle = new L.Circle(e.latlng, radius);
 				this.layerGroup.addLayer(circle);
 			}
-	}
+	},
+	
+	mapTypeChanged: function() {
+		if (this.mapType == "road"){
+			this.map.removeLayer(this.baseMaps.satellite);
+			this.map.addLayer(this.baseMaps.road);
+		}
+		else{
+			this.map.removeLayer(this.baseMaps.road);
+			this.map.addLayer(this.baseMaps.satellite);
+		}
+	},
+
 });

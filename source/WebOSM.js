@@ -19,8 +19,15 @@ enyo.kind({
 			{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("Start point"), showing: false},
 			{name: "switchInputIcon", icon: "images/menu-icon-swap.png", onclick: "switchInputsContent", showing: false},
 			{name: "endPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("End point"), showing: false},
-			{name: "routingOkButton", kind: "enyo.ActivityButton", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "doRouting"}
+			{name: "routingOkButton", kind: "enyo.ActivityButton", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "doRouting"},
+			{icon: "images/menu-icon-info.png", onclick: "showBaseTileMenu"}
 		]},
+		
+		{name: "baseTileMenu", kind: "enyo.Menu", defaultKind: "MenuCheckItem", components: [
+			{name: "roadTileMenuItem", caption: $L("Road"), icon: "images/map-type-road.png", value: "0", checked: true, onclick: "changeBaseTile"},
+			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"}
+		]},
+		
 		{flex: 1, kind: "enyo.Pane", components: [
 			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc"}
 		]},
@@ -79,6 +86,26 @@ enyo.kind({
 		this.$.toaster.open();
 	},
 	
+	showBaseTileMenu: function(inSender) {
+		this.$.baseTileMenu.openAroundControl(inSender);
+	},
+	
+	changeBaseTile: function(inSender) {
+		if (inSender.getValue() == 0){
+			inSender.setChecked(true);
+			this.$.satelliteTileMenuItem.setChecked(false);
+			this.$.map.setMapType("road");
+		}
+		else{
+			inSender.setChecked(true);
+			this.$.roadTileMenuItem.setChecked(false);
+			this.$.map.setMapType("satellite");
+			if(this.$.map.hasMap().getZoom() > 11){
+				this.$.map.hasMap().setZoom(11);
+			}
+		}
+	},
+
 	searchInputKeypress: function(inSender, inEvent) {
 		if (inEvent.keyCode == 13) {
 			this.doSearch();
@@ -116,7 +143,12 @@ enyo.kind({
 		this.$.map.hasLayers().addLayer(marker);
 		marker.bindPopup("<b>" + city + ", " + county + "<br/>" + state + ", " + country + "</b>").openPopup();
 		
-		this.$.map.hasMap().setView(markerLocation, 16);
+		if(this.$.map.getMapType() == "road"){
+			this.$.map.hasMap().setView(markerLocation, 16);
+		}
+		else{
+			this.$.map.hasMap().setView(markerLocation, 11);
+		}
 	},
 	
 	gotLocationStart: function(inSender, inResponse, inRequest) {
@@ -167,7 +199,7 @@ enyo.kind({
 	doRouting: function() {
 		this.$.routingOkButton.setActive(true);
 		this.$.routingOkButton.setDisabled(true);
-		this.$.map.clearAll();
+//		this.$.map.clearAll();
 		var startPoint = this.$.startPointInput.getValue();
 		var endPoint = this.$.endPointInput.getValue();
 		
