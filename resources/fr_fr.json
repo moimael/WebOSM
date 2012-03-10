@@ -1,11 +1,13 @@
 {
 	"Start point": "Point de départ",
 	"End point": "Arrivée",
+	"Road": "Plan",
+	"Satellite": "Satellite",
 	"Unable to find your location": "Impossible de déterminer votre position",
 	"You are within ": "Vous êtes dans un rayon de ",
 	" meters from this point": " mètres autour de ce point",
 	"About": "À propos",
 	"Close": "Fermer",
 	"Project website": "Site du projet",
-	"WebOSM is distributed under the terms of <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a> license<br/>Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a><br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a><br/>Leaflet is distributed under the terms of BSD license<br/>Some images are distributed under the terms of Apache license<br/>Copyright © 2012 Maël Lavault<br/><br/>" : "WebOSM est distribué sous les termes de la licence <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a>.<br/>Données cartographiques &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributeurs, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>.<br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a>.<br/>Leaflet est distribué sous les termes de la licence BSD.<br/>Certaines images sont distribuées sous les termes de la licence Apache.<br/>Copyright © 2012 Maël Lavault<br/><br/>"
+	"WebOSM is distributed under the terms of <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a> license.<br/>Map data &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>.<br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a>.<br/>Portions Courtesy NASA/JPL-Caltech and U.S. Depart. of Agriculture, Farm Service Agency.<br/>OpenAerials Tiles Courtesy of <a href=\"http://www.mapquest.com/\">MapQuest</a>.<br/>Leaflet is distributed under the terms of BSD license.<br/>Some images are distributed under the terms of Apache license.<br/>Copyright © 2012 Maël Lavault<br/><br/>" : "WebOSM est distribué sous les termes de la licence <a href=\"http://www.gnu.org/licenses/gpl.html\">GPLv3</a>.<br/>Données cartographiques &copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributeurs, <a href=\"http://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>.<br/>Imagery © <a href=\"http://cloudmade.com\">CloudMade</a>.<br/>Avec l'aimable autorisation de NASA/JPL-Caltech et du Départ. de l'Agriculture des États-Unis, Farm Service Agency.<br/>Avec l'aimable autorisation de <a href=\"http://www.mapquest.com/\">MapQuest</a> pour les données OpenAerials.<br/>Leaflet est distribué sous les termes de la licence BSD.<br/>Certaines images sont distribuées sous les termes de la licence Apache.<br/>Copyright © 2012 Maël Lavault<br/><br/>"
 }
