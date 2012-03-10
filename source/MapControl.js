@@ -26,7 +26,7 @@ enyo.kind({
 	},
 	
 	createMap: function(){
-		this.map = new L.Map(this.hasNode(), {zoomControl : false});
+		this.map = new L.Map(this.hasNode(), {zoomControl : false, attributionControl: false});
 		this.layerGroup = new L.LayerGroup();
 	},
 	
