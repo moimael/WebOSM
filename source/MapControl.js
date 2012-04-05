@@ -91,21 +91,11 @@ enyo.kind({
 	},
 	
 	gotLocationError: function(e) {
-			enyo.windows.addBannerMessage($L("Unable to find your location"), '{}');
-//			this.doLocationError();
+		this.doLocationError(e);
 	},
 	
 	gotLocation: function(e) {
-			if (typeof marker == 'undefined' && typeof circle == 'undefined'){
-				var radius = e.accuracy / 2;
-				var marker = new L.Marker(e.latlng);
-				this.layerGroup.addLayer(marker);
-				marker.bindPopup($L("You are within ") + radius + $L(" meters from this point")).openPopup();
-
-				var circle = new L.Circle(e.latlng, radius);
-				this.layerGroup.addLayer(circle);
-			}
-//			this.doLocationFound();
+		this.doLocationFound(e);
 	},
 	
 	mapTypeChanged: function() {

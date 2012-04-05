@@ -2,7 +2,7 @@ enyo.kind({
 	name: "WebOSM",
 	kind: "enyo.VFlexBox",
 	components: [
-		{kind: "enyo.ApplicationEvents", onLoad: "showLocation", onUnload: "disconnectGPS"},
+		{kind: "enyo.ApplicationEvents", onUnload: "disconnectGPS"},
 		{kind: "enyo.AppMenu", components: [
 			{kind: "enyo.EditMenu"},
 			{caption: $L("About"), onclick: "showAboutDialog"}
@@ -28,10 +28,10 @@ enyo.kind({
 			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"}
 		]},
 		{flex: 1, kind: "enyo.Pane", components: [
-			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc"}
+			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc", onLocationFound: "gotWiFiLocation", onLocationError: "gotWiFiLocationFailure"}
 		]},
 		{name: "routeInstructions", kind: "WebOSM.RouteInstructions", style: "width: 320px; top: 56px; bottom: 0;", flyInFrom: "right"},
-		{name: "bluetoothGPS", kind: "WebOSM.SPPGPS", onGPSDataReceived: "gotGPSData"},
+		{name: "bluetoothGPS", kind: "WebOSM.SPPGPS", onGPSDeviceNotFound: "showLocation", onGPSDataReceived: "gotGPSData"},
 		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"},
 		{name: "getLocationStart", kind: "enyo.WebService", onSuccess: "gotLocationStart", onFailure: "gotLocationStartFailure"},
 		{name: "getLocationEnd", kind: "enyo.WebService", onSuccess: "gotLocationEnd", onFailure: "gotLocationEndFailure"},
@@ -46,18 +46,59 @@ enyo.kind({
 		this.locations = [];
 	},
 	
+	/******************
+	** User location **
+	*******************/
+	
+	/* Bluetooth */
+	
+	gotGPSData: function(inSender, inData){
+		
+		this.$.map.clearAll();
+		
+		var position = new L.LatLng(inData.lat, inData.lng);
+		
+		var marker = new L.Marker(position);
+		this.$.map.hasLayers().addLayer(marker);
+		marker.bindPopup($L("You are here !")).openPopup();
+		
+		this.$.map.hasMap().setView(position, 16);
+	},
+	
 	disconnectGPS: function() {
-		/* unloadHandler() - Disconnect SPP Device
-			 * Called when application is dismissed/closed
+		/*
+		** Disconnect SPP Device
+		** Called when application is dismissed/closed
+		** make sure to disconnect from the SPP SERVICE!
 		*/
-		//make sure to disconnect from the SPP SERVICE!
 		this.$.bluetoothGPS.disconnectSPP();
 	},
 	
-	gotGPSData: function(inSender, inData){
-		this.log(inData);
-		this.$.map.hasMap().setView(new L.LatLng(inData.lat, inData.lng), 16);
+	/* WiFi */
+	
+	showLocation: function() {
+		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
+	
+	gotWiFiLocation: function(inSender, inResponse){
+		this.log(inSender + " : " + inResponse);
+		var radius = e.accuracy / 2;
+		var marker = new L.Marker(e.latlng);
+		this.$.map.hasLayers().addLayer(marker);
+		marker.bindPopup($L("You are within ") + radius + $L(" meters from this point")).openPopup();
+
+		var circle = new L.Circle(e.latlng, radius);
+		this.$.map.hasLayers().addLayer(circle);
+	},
+	
+	gotWiFiLocationFailure: function() {
+		enyo.windows.addBannerMessage($L("Unable to find your location"), '{}');
+	},
+	
+	/*******************
+	** User interface **
+	*******************/
+	
 	
 	searchTypeChanged: function(inSender) {
 		if(inSender.getValue() == 0){
@@ -171,7 +212,10 @@ enyo.kind({
 	gotRouting: function(inSender, inResponse, inRequest) {
 		this.path = inResponse.route_geometry;
 		this.instructions = inResponse.route_instructions;
+		
 		var latlngs = [];
+		var i;
+		
 		for(i = 0; i < this.path.length; i++){
 			latlngs.push(new L.LatLng(this.path[i]['0'], this.path[i]['1']));
 		}
@@ -179,12 +223,12 @@ enyo.kind({
 		// create a blue MultiPolyline from an arrays of LatLng points
 		var polyline = new L.Polyline(latlngs);
 		
-		var startMarker = new L.Marker(latlngs[0], {icon: new L.Icon({iconUrl: 'images/marker-a.png'})});
-		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon({iconUrl:'images/marker-b.png'})});
+		var startMarker = new L.Marker(latlngs[0], {icon: new L.Icon.Default({iconUrl: 'images/marker-a.png'})});
+		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon.Default({iconUrl:'images/marker-b.png'})});
 		this.$.map.hasLayers().addLayer(startMarker).addLayer(endMarker);
 		
 		// zoom the map to the MultiPolyline
-		this.$.map.hasMap().fitBounds(new L.LatLngBounds(latlngs[0], latlngs[latlngs.length - 1]));
+		this.$.map.hasMap().fitBounds(polyline.getBounds());
 		
 		// add the polyline to the map
 		this.$.map.hasLayers().addLayer(polyline);
@@ -192,10 +236,6 @@ enyo.kind({
 		this.$.routingOkButton.setDisabled(false);
 		
 		this.showToaster();
-	},
-	
-	showLocation: function() {
-//		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
 	
 	showAboutDialog: function() {

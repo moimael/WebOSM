@@ -2,7 +2,8 @@ enyo.kind({
 	name: "WebOSM.SPPGPS",
 	kind: "enyo.Component",
 	events: {
-		onGPSDataReceived: ""
+		onGPSDataReceived: "",
+		onGPSDeviceNotFound: ""
 	},
 	components:[
 		{ kind: "PalmService", name: "sppSubscription", subscribe: true},
@@ -35,8 +36,7 @@ enyo.kind({
 	},
 	disconnectSPP: function() {
 		/* disconnectSPP() - Disconnect SPP Device
-			 * !!!!Very Important!!!!
-			 * Disconnect from the SPP device when exiting the application!
+		* Disconnect from the SPP device when exiting the application!
 		*/
 		
 		// Clear the interval that requests our GPS data
@@ -104,7 +104,7 @@ enyo.kind({
 		});
 	},
 	readPortSuccess: function(inSender, inReponse) {
-		this.logInfo("Read Success: " + inReponse.returnValue + "<br /> Data Length: " + inReponse.dataLength);
+		this.logInfo("Read Success: " + inReponse.returnValue + "Data Length: " + inReponse.dataLength);
 		
 		/* Get the NMEA text output and parse - see NMEA specs online for more deatails*/
 		if (inReponse.returnValue===true) {
@@ -179,13 +179,13 @@ enyo.kind({
 					}
 					
 				} else {
-					enyo.windows.addBannerMessage("Invalid GPS data.  Perhaps connection is lost?");
+					this.logInfo("Invalid GPS data.  Perhaps connection is lost?");
 				}
 			} else {
 				this.logInfo("Error: GPS data undefined.")
 			}		
 		} else {
-			enyo.windows.addBannerMessage("Unable to read from SPP Port. Unknown error.", '{}');
+			this.logInfo("Unable to read from SPP Port. Unknown error.", '{}');
 		}
 		
 		this.openReadReady(this, {"returnValue": true});
@@ -264,6 +264,8 @@ enyo.kind({
 		var targetDevice = /GPS/i;
 		
 		if(objData.trusteddevices) {
+		
+			var i;
 			for (i = 0; i < objData.trusteddevices.length; i++) {
 				
 				//assumes "GPS" is within the name of the bluetooth device
@@ -292,19 +294,19 @@ enyo.kind({
 				} );
 			}
 			
-			
 		}
 		
 	},
 	trustedDevicesNotFound: function(objData) {
 		this.logInfo("No Trusted Bluetooth Devices Found: " + enyo.json.stringify(objData) );
+		this.doGPSDeviceNotFound();
 	},
 	logInfo: function(content) {
 		/* logInfo(content) - Log & display data on the screen
-			 * Logs content and displays it in reverse-chronological order
+		* Logs content and displays it in reverse-chronological order
 		*/
 		
-		var new_content = "<strong>" + this.i + "</strong>: " + content + "<br />";
+		var new_content = this.i + ": " + content;
 		this.log(new_content);
 		
 		this.i++;
