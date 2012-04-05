@@ -2,7 +2,7 @@ enyo.kind({
 	name: "WebOSM",
 	kind: "enyo.VFlexBox",
 	components: [
-		{kind: "enyo.ApplicationEvents", onLoad: "showLocation"},
+		{kind: "enyo.ApplicationEvents", onLoad: "showLocation", onUnload: "disconnectGPS"},
 		{kind: "enyo.AppMenu", components: [
 			{kind: "enyo.EditMenu"},
 			{caption: $L("About"), onclick: "showAboutDialog"}
@@ -27,23 +27,11 @@ enyo.kind({
 			{name: "roadTileMenuItem", caption: $L("Road"), icon: "images/map-type-road.png", value: "0", checked: true, onclick: "changeBaseTile"},
 			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"}
 		]},
-		
 		{flex: 1, kind: "enyo.Pane", components: [
 			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc"}
 		]},
-		
-		{kind: "enyo.Toaster", flyInFrom: "right", style: "width: 320px; top: 56px; bottom: 0;", className: "enyo-bg", components: [
-			{kind: "enyo.VFlexBox", height: "100%", components: [
-				{kind: "enyo.Toolbar", layoutKind: "enyo.HFlexLayout", components: [
-				]},
-				{name: "rightPane", kind: "enyo.Pane", flex: 1, components: [
-				]},
-				{kind: "enyo.Toolbar", align: "center", components: [
-					{name: "dragHandle", kind: "enyo.GrabButton", onclick: "close"}
-				]}
-			]}
-		]},
-		
+		{name: "routeInstructions", kind: "WebOSM.RouteInstructions", style: "width: 320px; top: 56px; bottom: 0;", flyInFrom: "right"},
+		{name: "bluetoothGPS", kind: "WebOSM.SPPGPS", onGPSDataReceived: "gotGPSData"},
 		{name: "getLocation", kind: "enyo.WebService", onSuccess: "gotLocation", onFailure: "gotLocationFailure"},
 		{name: "getLocationStart", kind: "enyo.WebService", onSuccess: "gotLocationStart", onFailure: "gotLocationStartFailure"},
 		{name: "getLocationEnd", kind: "enyo.WebService", onSuccess: "gotLocationEnd", onFailure: "gotLocationEndFailure"},
@@ -56,6 +44,19 @@ enyo.kind({
 		var currentLocale = new enyo.g11n.currentLocale();
 		this.localeLanguage = currentLocale.getLanguage();
 		this.locations = [];
+	},
+	
+	disconnectGPS: function() {
+		/* unloadHandler() - Disconnect SPP Device
+			 * Called when application is dismissed/closed
+		*/
+		//make sure to disconnect from the SPP SERVICE!
+		this.$.bluetoothGPS.disconnectSPP();
+	},
+	
+	gotGPSData: function(inSender, inData){
+		this.log(inData);
+		this.$.map.hasMap().setView(new L.LatLng(inData.lat, inData.lng), 16);
 	},
 	
 	searchTypeChanged: function(inSender) {
@@ -83,7 +84,9 @@ enyo.kind({
 	},
 	
 	showToaster: function() {
-		this.$.toaster.open();
+		this.$.routeInstructions.setInstructionsList(this.instructions);
+		this.$.routeInstructions.open();
+		this.$.routeInstructions.setupView();
 	},
 	
 	showBaseTileMenu: function(inSender) {
@@ -166,30 +169,33 @@ enyo.kind({
 	},
 	
 	gotRouting: function(inSender, inResponse, inRequest) {
-		this.results = inResponse.route_geometry;
+		this.path = inResponse.route_geometry;
+		this.instructions = inResponse.route_instructions;
 		var latlngs = [];
-		var test = [];
-		for(i = 0; i < this.results.length - 1; i++){
-			test.push(new L.LatLng(this.results[i]['0'], this.results[i]['1']));
-			test.push(new L.LatLng(this.results[i+1]['0'], this.results[i+1]['1']));
-			latlngs.push(test);
-			test = [];
+		for(i = 0; i < this.path.length; i++){
+			latlngs.push(new L.LatLng(this.path[i]['0'], this.path[i]['1']));
 		}
 
 		// create a blue MultiPolyline from an arrays of LatLng points
-		var mpolyline = new L.MultiPolyline(latlngs);
+		var polyline = new L.Polyline(latlngs);
+		
+		var startMarker = new L.Marker(latlngs[0], {icon: new L.Icon({iconUrl: 'images/marker-a.png'})});
+		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon({iconUrl:'images/marker-b.png'})});
+		this.$.map.hasLayers().addLayer(startMarker).addLayer(endMarker);
 		
 		// zoom the map to the MultiPolyline
-		this.$.map.hasMap().fitBounds(new L.LatLngBounds(latlngs['0']['0'], latlngs[latlngs.length - 1]['0']));
+		this.$.map.hasMap().fitBounds(new L.LatLngBounds(latlngs[0], latlngs[latlngs.length - 1]));
 		
 		// add the polyline to the map
-		this.$.map.hasLayers().addLayer(mpolyline);
+		this.$.map.hasLayers().addLayer(polyline);
 		this.$.routingOkButton.setActive(false);
 		this.$.routingOkButton.setDisabled(false);
+		
+		this.showToaster();
 	},
 	
 	showLocation: function() {
-		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
+//		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
 	
 	showAboutDialog: function() {
@@ -197,13 +203,14 @@ enyo.kind({
 	},
 	
 	doRouting: function() {
-		this.$.routingOkButton.setActive(true);
-		this.$.routingOkButton.setDisabled(true);
-//		this.$.map.clearAll();
 		var startPoint = this.$.startPointInput.getValue();
 		var endPoint = this.$.endPointInput.getValue();
 		
 		if(startPoint && endPoint){
+			this.$.routingOkButton.setActive(true);
+			this.$.routingOkButton.setDisabled(true);
+			this.$.map.clearAll();
+		
 			this.$.getLocationStart.setUrl("http://where.yahooapis.com/geocode?location=" + startPoint + "&flags=J&appid=fTGKVi5e");
 			this.$.getLocationStart.call();
 			this.$.getLocationEnd.setUrl("http://where.yahooapis.com/geocode?location=" + endPoint + "&flags=J&appid=fTGKVi5e");
