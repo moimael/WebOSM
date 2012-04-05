@@ -18,8 +18,15 @@ enyo.kind({
 		credentials: "",
 		mapType: "road"
 	},
+	events: {
+		onLocationFound: "",
+		onLocationError: ""
+	},
+	
 	create: function() {
 		this.inherited(arguments);
+		// Use Canvas fallback instead of SVG, because WebOS do not handle it very well.
+		L.Path.SVG = false;
 	},
 
 	rendered: function() {
@@ -48,6 +55,8 @@ enyo.kind({
 		var cloudMade = new L.TileLayer('http://{s}.tile.cloudmade.com/' + this.credentials + '/997/256/{z}/{x}/{y}.png', {
 			maxZoom: 18
 		});
+		
+		// create a OpenAerials tile layer
 		var openAerials = new L.TileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
 			maxZoom: 18, subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
 		});
@@ -83,6 +92,7 @@ enyo.kind({
 	
 	gotLocationError: function(e) {
 			enyo.windows.addBannerMessage($L("Unable to find your location"), '{}');
+//			this.doLocationError();
 	},
 	
 	gotLocation: function(e) {
@@ -95,6 +105,7 @@ enyo.kind({
 				var circle = new L.Circle(e.latlng, radius);
 				this.layerGroup.addLayer(circle);
 			}
+//			this.doLocationFound();
 	},
 	
 	mapTypeChanged: function() {
