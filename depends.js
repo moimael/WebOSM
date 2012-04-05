@@ -2,6 +2,8 @@ enyo.depends(
 	"source/leaflet.js",
 	"source/WebOSM.js",
 	"source/MapControl.js",
+	"source/bluetoothGPS.js",
+	"source/Toaster.js",
 	"source/AboutDialog.js",
 	"css/leaflet.css"
 );
