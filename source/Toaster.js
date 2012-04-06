@@ -24,7 +24,12 @@ enyo.kind({
 					]}
 				]},
 				{kind: "enyo.Toolbar", align: "center", components: [
-					{name: "dragHandle", kind: "enyo.GrabButton", onclick: "close"}
+					{name: "dragHandle", kind: "enyo.GrabButton", onclick: "close"},
+//					{name: "routeType", kind: "enyo.RadioToolButtonGroup", onChange: "routeTypeChanged", components: [
+//						{kind: "enyo.RadioToolButton", icon: "images/footer-button-icon-walking.png", className: "enyo-grouped-toolbutton-dark"},
+//						{kind: "enyo.RadioToolButton", icon: "images/topbar-direct-icon.png", className: "enyo-grouped-toolbutton-dark"},
+//						{kind: "enyo.RadioToolButton", icon: "images/footer-button-icon-car.png", className: "enyo-grouped-toolbutton-dark"}
+//					]}
 				]}
 			]}
 	],
@@ -42,7 +47,8 @@ enyo.kind({
 		}
 	},
 	
-	setupView: function() {
+	showToaster: function() {
+		this.open();
 		this.$.instructionsList.render();
 	},
 	
