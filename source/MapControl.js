@@ -107,6 +107,5 @@ enyo.kind({
 			this.map.removeLayer(this.baseMaps.road);
 			this.map.addLayer(this.baseMaps.satellite);
 		}
-	},
-
+	}
 });

@@ -66,7 +66,7 @@ enyo.kind({
 				onSuccess: "sppDisconnectSuccess",
 				onFailure: "sppDisconnectFailure"
 			}
-		 );
+		);
 	},
 	getDevicesResponse: function(inSender, inResponse) {
 		
@@ -182,7 +182,7 @@ enyo.kind({
 					this.logInfo("Invalid GPS data.  Perhaps connection is lost?");
 				}
 			} else {
-				this.logInfo("Error: GPS data undefined.")
+				this.logInfo("Error: GPS data undefined.");
 			}		
 		} else {
 			this.logInfo("Unable to read from SPP Port. Unknown error.", '{}');
@@ -219,7 +219,7 @@ enyo.kind({
 								method: "selectservice",
 								onResponse: "selectServiceResponse"
 							}
-						 );
+						);
 						
 						return;
 						break;

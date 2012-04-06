@@ -31,7 +31,7 @@ enyo.kind({
 	},
 		
 	searchTypeChanged: function(inSender) {
-		if(inSender.getValue() == 0){
+		if(inSender.getValue() === 0){
 			this.$.startPointInput.hide();
 			this.$.switchInputIcon.hide();
 			this.$.endPointInput.hide();
@@ -93,7 +93,7 @@ enyo.kind({
 	
 	changeBaseTile: function(inSender) {
 		var mapType;
-		if (inSender.getValue() == 0){
+		if (inSender.getValue() === '0'){
 			inSender.setChecked(true);
 			this.$.satelliteTileMenuItem.setChecked(false);
 			mapType = "road";

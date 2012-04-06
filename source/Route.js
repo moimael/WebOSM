@@ -6,7 +6,7 @@ enyo.kind({
 		language: ""
 	},
 	events: {
-		onRoutingSuccess: "",
+		onRoutingSuccess: ""
 	},
 	components: [
 		{name: "getLocation", kind: "WebOSM.Search", onSearchSuccess: "gotLocation"},
