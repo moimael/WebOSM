@@ -94,7 +94,7 @@ enyo.kind({
 		// Read port
 		this.$.sppService.call({
 			"instanceId": this.instanceId,
-			"dataLength": 1024
+			"dataLength": 2048
 		},
 		{
 			service: "palm://com.palm.service.bluetooth.spp/",
@@ -220,8 +220,6 @@ enyo.kind({
 								onResponse: "selectServiceResponse"
 							}
 						);
-						
-						return;
 						break;
 	
 					case "notifnconnected":
@@ -240,8 +238,6 @@ enyo.kind({
 							});
 							
 						}
-						return;
-						
 						break;
 	
 					case "notifndisconnected":
@@ -261,7 +257,7 @@ enyo.kind({
 		this.targetAddress = "";
 		
 		// Are there any trusted devices containing 'GPS' || 'gps' with name - Change this based on your device id
-		var targetDevice = /GPS/i;
+		var targetDevice = /GPS|Pre|Pixi|Palm/i;
 		
 		if(objData.trusteddevices) {
 		
