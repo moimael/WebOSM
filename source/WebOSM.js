@@ -7,13 +7,13 @@ enyo.kind({
 			{kind: "enyo.EditMenu"},
 			{caption: $L("About"), onclick: "showAboutDialog"}
 		]},
-		{name: "actionBar", kind: "WebOSM.ActionBar", onRoutingStarted: "doRouting", onBaseTileChanged: "setMapType", onSearchStarted: "doSearch"},
+		{name: "actionBar", kind: "WebOSM.ActionBar", onRoutingStarted: "doRouting", onBaseTileChanged: "setMapType", onSearchStarted: "doSearch", onToggleToaster: "toggleToaster", onMyLocationRequested: "showLocation"},
 		{flex: 1, kind: "enyo.Pane", components: [
 			{name: "map", kind: "WebOSM.MapControl", credentials: "8c92938a1540489f822ce0ade39e7acc", onLocationFound: "gotWiFiLocation", onLocationError: "gotWiFiLocationFailure"}
 		]},
 		{name: "routeInstructions", kind: "WebOSM.RouteInstructions", style: "width: 320px; top: 56px; bottom: 0;", flyInFrom: "right"},
 		{name: "bluetoothGPS", kind: "WebOSM.SPPGPS", onGPSDeviceNotFound: "showLocation", onGPSDataReceived: "gotGPSData"},
-		{name: "routeData", kind: "WebOSM.Route", credentials: "8c92938a1540489f822ce0ade39e7acc", onRoutingSuccess: "drawRoute"},
+		{name: "routeData", kind: "WebOSM.Route", credentials: "8c92938a1540489f822ce0ade39e7acc", onRoutingSuccess: "drawRoute", onRoutingFailure: ""}, //TODO reactiver bouton ok sur failure
 		{name: "searchData", kind: "WebOSM.Search", credentials: "fTGKVi5e", onSearchSuccess: "drawSearchMarker"},
 		{name: "aboutDialog", kind: "WebOSM.AboutDialog"}
 	],
@@ -33,12 +33,12 @@ enyo.kind({
 	
 	gotGPSData: function(inSender, inData){
 		
-		this.$.map.clearAll(); //TODO: Faire un layer special pour la localisation de l'utilisateur et n'effacer que ce layer
+		this.$.map.clearGPSLayer(); //TODO: Faire un layer special pour la localisation de l'utilisateur et n'effacer que ce layer et un layer pour les markers
 		
 		var position = new L.LatLng(inData.lat, inData.lng);
 		
 		var marker = new L.Marker(position);
-		this.$.map.hasLayers().addLayer(marker);
+		this.$.map.hasGPSLayers().addLayer(marker);
 		marker.bindPopup($L("You are here !")).openPopup();
 		
 		this.$.map.hasMap().setView(position, 16);
@@ -56,18 +56,18 @@ enyo.kind({
 	/* WiFi */
 	
 	showLocation: function() {
-		this.$.map.hasMap().clearAll(); //TODO: refléchir quoi effacer
+		this.$.map.clearAll(); //TODO: refléchir quoi effacer
 		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
 	
 	gotWiFiLocation: function(inSender, inResponse){
 		this.log(inSender + " : " + inResponse);
-		var radius = e.accuracy / 2;
-		var marker = new L.Marker(e.latlng);
+		var radius = inResponse.accuracy / 2;
+		var marker = new L.Marker(inResponse.latlng);
 		this.$.map.hasLayers().addLayer(marker);
 		marker.bindPopup($L("You are within ") + radius + $L(" meters from this point")).openPopup();
 
-		var circle = new L.Circle(e.latlng, radius);
+		var circle = new L.Circle(inResponse.latlng, radius);
 		this.$.map.hasLayers().addLayer(circle);
 	},
 	
@@ -131,6 +131,14 @@ enyo.kind({
 		
 		// Show route instruction in a sidebar popup
 		this.$.routeInstructions.setInstructionsList(instructions);
+		this.showToaster();
+	},
+	
+	toggleToaster: function() {
+		this.$.routeInstructions.toggleToaster();
+	},
+	
+	showToaster: function() {
 		this.$.routeInstructions.showToaster();
 	},
 	
