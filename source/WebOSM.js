@@ -31,7 +31,7 @@ enyo.kind({
 	
 	/* Bluetooth */
 	
-	gotGPSData: function(inSender, inData){
+	gotGPSData: function(inSender, inData) {
 		
 		this.$.map.clearGPSLayer(); //TODO: Faire un layer special pour la localisation de l'utilisateur et n'effacer que ce layer et un layer pour les markers
 		
@@ -60,7 +60,7 @@ enyo.kind({
 		this.$.map.hasMap().locate({setView: true, maxZoom: 16});
 	},
 	
-	gotWiFiLocation: function(inSender, inResponse){
+	gotWiFiLocation: function(inSender, inResponse) {
 		this.log(inSender + " : " + inResponse);
 		var radius = inResponse.accuracy / 2;
 		var marker = new L.Marker(inResponse.latlng);
@@ -81,15 +81,15 @@ enyo.kind({
 	
 	setMapType: function(inSender, mapType) {
 		this.$.map.setMapType(mapType);
-		if(mapType === "satellite" && this.$.map.hasMap().getZoom() > 11){
+		if(mapType === "satellite" && this.$.map.hasMap().getZoom() > 11) {
 			this.$.map.hasMap().setZoom(11);
 		}
 	},
 	
-	doSearch: function(){
+	doSearch: function() {
 		this.$.map.clearAll();
 		var location = this.$.actionBar.getSearchInputValue();
-		if (location){
+		if (location) {
 			this.$.searchData.findLocation(location);
 		}
 	},
@@ -101,10 +101,10 @@ enyo.kind({
 		this.$.map.hasLayers().addLayer(marker);
 		marker.bindPopup("<b>" + inResults.city + ", " + inResults.county + "<br/>" + inResults.state + ", " + inResults.country + "</b>").openPopup();
 		
-		if(this.$.map.getMapType() == "road"){
+		if(this.$.map.getMapType() === "road") {
 			this.$.map.hasMap().setView(markerLocation, 16);
 		}
-		else{
+		else {
 			this.$.map.hasMap().setView(markerLocation, 11);
 		}
 	},
@@ -116,7 +116,7 @@ enyo.kind({
 		
 		// Create two markers with custom icons for route startPoint and endPoint
 		var startMarker = new L.Marker(latlngs[0], {icon: new L.Icon.Default({iconUrl: 'images/marker-a.png'})});
-		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon.Default({iconUrl:'images/marker-b.png'})});
+		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon.Default({iconUrl: 'images/marker-b.png'})});
 		
 		// Add the to markers on the map
 		this.$.map.hasLayers().addLayer(startMarker).addLayer(endMarker);

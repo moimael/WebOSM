@@ -34,7 +34,7 @@ enyo.kind({
 	},
 		
 	searchTypeChanged: function(inSender) {
-		if(inSender.getValue() === 0){
+		if(inSender.getValue() === 0) {
 			this.$.startPointInput.hide();
 			this.$.switchInputIcon.hide();
 			this.$.endPointInput.hide();
@@ -51,7 +51,7 @@ enyo.kind({
 	},
 		
 	searchInputKeypress: function(inSender, inEvent) {
-		if (inEvent.keyCode == 13) {
+		if (inEvent.keyCode === 13) {
 			this.doSearchStarted();
 		}
 	},
@@ -60,7 +60,7 @@ enyo.kind({
 		var startPoint = this.$.startPointInput.getValue();
 		var endPoint = this.$.endPointInput.getValue();
 		
-		if(startPoint && endPoint){
+		if(startPoint && endPoint) {
 			this.$.routingOkButton.setActive(true);
 			this.$.routingOkButton.setDisabled(true);
 			this.doRoutingStarted();
