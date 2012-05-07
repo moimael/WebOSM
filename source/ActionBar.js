@@ -4,7 +4,9 @@ enyo.kind({
 	events: {
 		onSearchStarted: "",
 		onRoutingStarted: "",
-		onBaseTileChanged: ""
+		onBaseTileChanged: "",
+		onToggleToaster: "",
+		onMyLocationRequested: ""
 	},
 	components: [
 		{name: "searchType", kind: "enyo.RadioToolButtonGroup", onChange: "searchTypeChanged",
@@ -13,7 +15,7 @@ enyo.kind({
 				{kind: "enyo.RadioToolButton", icon: "images/topbar-direct-icon.png", className: "enyo-grouped-toolbutton-dark"}
 			]
 		},
-		{icon: "images/menu-icon-mylocation.png", onclick: "showLocation"},
+		{icon: "images/menu-icon-mylocation.png", onclick: "doMyLocationRequested"},
 		{name: "searchInput", kind: "enyo.ToolSearchInput", flex: 1, onkeypress: "searchInputKeypress"},
 		{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("Start point"), showing: false},
 		{name: "switchInputIcon", icon: "images/menu-icon-swap.png", onclick: "switchInputsContent", showing: false},
@@ -23,7 +25,8 @@ enyo.kind({
 		{name: "baseTileMenu", kind: "enyo.Menu", defaultKind: "MenuCheckItem", components: [
 			{name: "roadTileMenuItem", caption: $L("Road"), icon: "images/map-type-road.png", value: "0", checked: true, onclick: "changeBaseTile"},
 			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"}
-		]}
+		]},
+		{name: "routeInstructionsIcon", icon: "images/menu-icon-log.png", onclick: "doToggleToaster"}
 	],
 	
 	create: function() {
