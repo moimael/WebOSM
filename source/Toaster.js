@@ -47,7 +47,19 @@ enyo.kind({
 		}
 	},
 	
+	toggleToaster: function() {
+		
+		if(this.showing){
+			this.close();
+			this.$.instructionsList.render();
+		} else {
+			this.open();
+			this.$.instructionsList.render();
+		}
+	},
+	
 	showToaster: function() {
+		
 		this.open();
 		this.$.instructionsList.render();
 	},
