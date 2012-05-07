@@ -6,7 +6,8 @@ enyo.kind({
 		language: ""
 	},
 	events: {
-		onRoutingSuccess: ""
+		onRoutingSuccess: "",
+		onRoutingFailure: ""
 	},
 	components: [
 		{name: "getLocation", kind: "WebOSM.Search", onSearchSuccess: "gotLocation"},
@@ -38,6 +39,10 @@ enyo.kind({
 			latlngs.push(new L.LatLng(this.path[i]['0'], this.path[i]['1']));
 		}
 		this.doRoutingSuccess(latlngs, this.instructions);
+	},
+	
+	gotRoutingFailure: function(inSender, inResponse) {
+		this.doRoutingFailure();
 	},
 	
 	startRouting: function(){
