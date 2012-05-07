@@ -36,6 +36,7 @@ enyo.kind({
 	createMap: function(){
 		this.map = new L.Map(this.hasNode(), {zoomControl : false, attributionControl: false});
 		this.layerGroup = new L.LayerGroup();
+		this.userGPSPosition = new L.LayerGroup();
 	},
 	
 	destroyMap: function(){
@@ -69,6 +70,7 @@ enyo.kind({
 		// add the CloudMade layer to the map and set the view to a given center
 		this.map.addLayer(cloudMade).setView(new L.LatLng(51.505, -0.09), 3);
 		this.map.addLayer(this.layerGroup);
+		this.map.addLayer(this.userGPSPosition);
 		this.connectEvents();
 		this.mapTypeChanged();
 	},
@@ -81,8 +83,16 @@ enyo.kind({
 		return this.layerGroup;
 	},
 	
+	hasGPSLayers: function() {
+		return this.userGPSPosition;
+	},
+	
 	clearAll: function() {
 		this.layerGroup.clearLayers();
+	},
+	
+	clearGPSLayer: function() {
+		this.userGPSPosition.clearLayers();
 	},
 	
 	connectEvents: function() {
