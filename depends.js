@@ -1,5 +1,6 @@
 enyo.depends(
 	"source/leaflet.js",
+	"source/TileLayer.MBTiles.js",
 	"source/WebOSM.js",
 	"source/ActionBar.js",
 	"source/MapControl.js",
@@ -8,5 +9,6 @@ enyo.depends(
 	"source/Route.js",
 	"source/Toaster.js",
 	"source/AboutDialog.js",
+	"source/database.js",
 	"css/leaflet.css"
 );

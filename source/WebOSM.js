@@ -15,7 +15,8 @@ enyo.kind({
 		{name: "bluetoothGPS", kind: "WebOSM.SPPGPS", onGPSDeviceNotFound: "showLocation", onGPSDataReceived: "gotGPSData"},
 		{name: "routeData", kind: "WebOSM.Route", credentials: "8c92938a1540489f822ce0ade39e7acc", onRoutingSuccess: "drawRoute", onRoutingFailure: ""}, //TODO reactiver bouton ok sur failure
 		{name: "searchData", kind: "WebOSM.Search", credentials: "fTGKVi5e", onSearchSuccess: "drawSearchMarker"},
-		{name: "aboutDialog", kind: "WebOSM.AboutDialog"}
+		{name: "aboutDialog", kind: "WebOSM.AboutDialog"},
+		{kind: enyo.Hybrid, name: "plugin", executable: "db", width: 0, height: 0, onPluginReady: "handlePluginReady"}
 	],
 	
 	create: function() {
@@ -23,6 +24,14 @@ enyo.kind({
 		var currentLocale = new enyo.g11n.currentLocale();
 		this.localeLanguage = currentLocale.getLanguage();
 		this.locations = [];
+		this.dao = new WebOSM.Database;
+		this.dao.plugin = this.$.plugin;
+	},
+	
+	handlePluginReady: function() {
+		this.dao.selectItems(function(rows) {
+			console.log("onItemCallback.onCompletedCallback: " + rows.length + rows);
+		});
 	},
 	
 	/******************

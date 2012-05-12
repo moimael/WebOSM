@@ -53,18 +53,32 @@ enyo.kind({
 		}
 		
 		// create a CloudMade tile layer
-		var cloudMade = new L.TileLayer('http://{s}.tile.cloudmade.com/' + this.credentials + '/997/256/{z}/{x}/{y}.png', {
-			maxZoom: 18
-		});
+		var cloudMade = new L.TileLayer('http://{s}.tile.cloudmade.com/' + this.credentials + '/997/256/{z}/{x}/{y}.png',
+			{
+				maxZoom: 18
+			}
+		);
 		
 		// create a OpenAerials tile layer
-		var openAerials = new L.TileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png', {
-			maxZoom: 18, subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
-		});
+		var openAerials = new L.TileLayer('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
+			{
+				maxZoom: 18,
+				subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
+			}
+		);
+		
+		// create a Offline tile layer
+		var offline = new L.TileLayer.MBTiles('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
+			{
+				maxZoom: 18,
+				subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
+			}
+		);
 		
 		this.baseMaps = {
 			"road": cloudMade,
-			"satellite": openAerials
+			"satellite": openAerials,
+			"offline": offline
 		};
 
 		// add the CloudMade layer to the map and set the view to a given center
@@ -109,13 +123,20 @@ enyo.kind({
 	},
 	
 	mapTypeChanged: function() {
-		if (this.mapType == "road"){
+		if (this.mapType === "road"){
 			this.map.removeLayer(this.baseMaps.satellite);
+			this.map.removeLayer(this.baseMaps.offline);
 			this.map.addLayer(this.baseMaps.road);
 		}
-		else{
+		else if (this.mapType === "satellite"){
 			this.map.removeLayer(this.baseMaps.road);
+			this.map.removeLayer(this.baseMaps.offline);
 			this.map.addLayer(this.baseMaps.satellite);
+		}
+		else {
+			this.map.removeLayer(this.baseMaps.road);
+			this.map.removeLayer(this.baseMaps.satellite);
+			this.map.addLayer(this.baseMaps.offline);
 		}
 	}
 });

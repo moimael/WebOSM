@@ -24,7 +24,8 @@ enyo.kind({
 		{icon: "images/menu-icon-info.png", onclick: "showBaseTileMenu"},
 		{name: "baseTileMenu", kind: "enyo.Menu", defaultKind: "MenuCheckItem", components: [
 			{name: "roadTileMenuItem", caption: $L("Road"), icon: "images/map-type-road.png", value: "0", checked: true, onclick: "changeBaseTile"},
-			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"}
+			{name: "satelliteTileMenuItem", caption: $L("Satellite"), icon: "images/map-type-satellite.png", value: "1", onclick: "changeBaseTile"},
+			{name: "offlineTileMenuItem", caption: $L("Offline"), icon: "images/.png", value: "2", onclick: "changeBaseTile"}
 		]},
 		{name: "routeInstructionsIcon", icon: "images/menu-icon-log.png", onclick: "doToggleToaster"}
 	],
@@ -99,12 +100,20 @@ enyo.kind({
 		if (inSender.getValue() === '0'){
 			inSender.setChecked(true);
 			this.$.satelliteTileMenuItem.setChecked(false);
+			this.$.offlineTileMenuItem.setChecked(false);
 			mapType = "road";
 		}
-		else{
+		else if (inSender.getValue() === '1'){
 			inSender.setChecked(true);
+			this.$.offlineTileMenuItem.setChecked(false);
 			this.$.roadTileMenuItem.setChecked(false);
 			mapType = "satellite";
+		}
+		else {
+			inSender.setChecked(true);
+			this.$.satelliteTileMenuItem.setChecked(false);
+			this.$.roadTileMenuItem.setChecked(false);
+			mapType = "offline";
 		}
 		this.doBaseTileChanged(mapType);
 	}
