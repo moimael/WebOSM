@@ -16,7 +16,8 @@ enyo.kind({
 	kind: "enyo.Control",
 	published: {
 		credentials: "",
-		mapType: "road"
+		mapType: "road",
+		db: ""
 	},
 	events: {
 		onLocationFound: "",
@@ -67,18 +68,9 @@ enyo.kind({
 			}
 		);
 		
-		// create a Offline tile layer
-		var offline = new L.TileLayer.MBTiles('http://{s}.mqcdn.com/tiles/1.0.0/sat/{z}/{x}/{y}.png',
-			{
-				maxZoom: 18,
-				subdomains: ['oatile1', 'oatile2', 'oatile3', 'oatile4']
-			}
-		);
-		
 		this.baseMaps = {
 			"road": cloudMade,
-			"satellite": openAerials,
-			"offline": offline
+			"satellite": openAerials
 		};
 
 		// add the CloudMade layer to the map and set the view to a given center
@@ -125,18 +117,36 @@ enyo.kind({
 	mapTypeChanged: function() {
 		if (this.mapType === "road"){
 			this.map.removeLayer(this.baseMaps.satellite);
-			this.map.removeLayer(this.baseMaps.offline);
+			if(typeof(this.baseMaps.offline) != 'undefined'){
+				this.map.removeLayer(this.baseMaps.offline);
+			}
 			this.map.addLayer(this.baseMaps.road);
 		}
 		else if (this.mapType === "satellite"){
 			this.map.removeLayer(this.baseMaps.road);
-			this.map.removeLayer(this.baseMaps.offline);
+			if(typeof(this.baseMaps.offline) != 'undefined'){
+				this.map.removeLayer(this.baseMaps.offline);
+			}
 			this.map.addLayer(this.baseMaps.satellite);
 		}
 		else {
-			this.map.removeLayer(this.baseMaps.road);
-			this.map.removeLayer(this.baseMaps.satellite);
-			this.map.addLayer(this.baseMaps.offline);
+			if(typeof(this.baseMaps.offline) != 'undefined'){
+				this.map.removeLayer(this.baseMaps.road);
+				this.map.removeLayer(this.baseMaps.satellite);
+				this.map.addLayer(this.baseMaps.offline);
+			}
 		}
+	},
+	
+	dbChanged: function(){
+		this.log("test" + this.db);
+		// create a Offline tile layer
+		var offline = new L.TileLayer.MBTiles('',
+			{
+				maxZoom: 14,
+				scheme: 'tms'
+			}, this.db);
+		this.baseMaps.offline = offline;
+		this.setMapType("offline");
 	}
 });

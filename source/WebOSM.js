@@ -24,14 +24,19 @@ enyo.kind({
 		var currentLocale = new enyo.g11n.currentLocale();
 		this.localeLanguage = currentLocale.getLanguage();
 		this.locations = [];
-		this.dao = new WebOSM.Database;
-		this.dao.plugin = this.$.plugin;
 	},
 	
 	handlePluginReady: function() {
-		this.dao.selectItems(function(rows) {
-			console.log("onItemCallback.onCompletedCallback: " + rows.length + rows);
-		});
+		this.dao = new WebOSM.Database();
+		this.dao.plugin = this.$.plugin;
+		this.dao.openDatabase();
+//		this.dao = new WebOSM.Database();
+//		this.dao.plugin = this.$.plugin;
+//		this.dao.openDatabase();
+//		this.$.map.db = this.dao;
+//		this.dao.selectItems(function(rows) {
+//			console.log("onItemCallback.onCompletedCallback: " + rows.length + rows);
+//		});
 	},
 	
 	/******************
@@ -92,6 +97,9 @@ enyo.kind({
 		this.$.map.setMapType(mapType);
 		if(mapType === "satellite" && this.$.map.hasMap().getZoom() > 11) {
 			this.$.map.hasMap().setZoom(11);
+		}
+		else if(mapType === "offline"){
+			this.$.map.setDb(this.dao);
 		}
 	},
 	

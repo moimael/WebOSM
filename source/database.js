@@ -4,29 +4,28 @@
 enyo.kind({
 	name: "WebOSM.Database",
 	/* ctor */
+	dbname: "OSMBrightSLValley.mbtiles",
 	create: function() {
 		this.inherited(arguments);
 		this.plugin = undefined;
-		this.dbname = "foobar.db";
 		this.db = null;
 	},
 	/*
 	 * open the database
 	 */
-	openDatabase : function(callback) {
+	openDatabase : function() {
 		if (this.db != null && this.db['open'] == 1) {
 			return;
 		}
 
-		var f = (function() {
-			var ret = this.plugin.callPluginMethod("openDatabase", this.dbname);
+		var f = (function(dbname) {
+			console.log(dbname);
+			var ret = this.plugin.callPluginMethod("openDatabase", dbname);
 			var json = enyo.json.parse(ret);
-			console.log("openDatabase: " + json);
+			console.log("openDatabase: " + enyo.json.stringify(json));
 			this.db = json;	
-			callback();
 		}).bind(this);
-
-		f();
+		f(this.dbname);
 	},
 
 	closeDbIfOpen: function() {
@@ -42,7 +41,7 @@ enyo.kind({
 			var ret = this.plugin.callPluginMethod("executeSql", this.dbname, "select content from foo");
 			console.log("selectItems: " + ret);
 			var json = enyo.json.parse(ret);
-			var rows = $A();
+			var rows = [];
 			for (var i = 0; i < json.rows.length; i++) {
 				rows[i] = json.rows[i];
 			}
