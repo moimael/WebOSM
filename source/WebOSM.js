@@ -115,8 +115,24 @@ enyo.kind({
 		var polyline = new L.Polyline(latlngs);
 		
 		// Create two markers with custom icons for route startPoint and endPoint
-		var startMarker = new L.Marker(latlngs[0], {icon: new L.Icon.Default({iconUrl: 'images/marker-a.png'})});
-		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {icon: new L.Icon.Default({iconUrl: 'images/marker-b.png'})});
+		var startMarker = new L.Marker(latlngs[0], {
+			icon: new L.Icon({
+				iconUrl: 'images/marker-a.png', iconSize: new L.Point(25, 41),
+				iconAnchor: new L.Point(13, 41),
+				popupAnchor: new L.Point(0, -33),
+				shadowSize: new L.Point(41, 41)
+			})
+		});
+		
+		var endMarker = new L.Marker(latlngs[latlngs.length - 1], {
+			icon: new L.Icon({
+				iconUrl: 'images/marker-b.png',
+				iconSize: new L.Point(25, 41),
+				iconAnchor: new L.Point(13, 41),
+				popupAnchor: new L.Point(0, -33),
+				shadowSize: new L.Point(41, 41)
+			})
+		});
 		
 		// Add the to markers on the map
 		this.$.map.hasLayers().addLayer(startMarker).addLayer(endMarker);
