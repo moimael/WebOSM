@@ -27,7 +27,13 @@ enyo.kind({
 	gotLocation: function(inSender, inResponse) {
 		var latlng = new L.LatLng(inResponse.lat, inResponse.lng);
 		this.locations.push(latlng);
-		this.startRouting();
+		if(this.locations.length === 2){
+//			if(this.locations[0].type === "endPoint"){
+//				this.locations.reverse();
+//			}
+			this.startRouting(this.locations[0], this.locations[1]);
+			this.locations = [];
+		}
 	},
 	
 	gotRouting: function(inSender, inResponse) {
@@ -45,11 +51,8 @@ enyo.kind({
 		this.doRoutingFailure();
 	},
 	
-	startRouting: function(){
-		if(this.locations.length == 2){
-			this.$.getRouting.setUrl("http://routes.cloudmade.com/" + this.credentials + "/api/0.3/" + this.locations[0].lat + "," + this.locations[0].lng + "," + this.locations[1].lat + "," + this.locations[1].lng + "/car.js?lang=" + this.language + "&units=km");
-			this.$.getRouting.call();
-			this.locations = [];
-		}
+	startRouting: function(startPoint, endPoint){
+		this.$.getRouting.setUrl("http://routes.cloudmade.com/" + this.credentials + "/api/0.3/" + startPoint.lat + "," + startPoint.lng + "," + endPoint.lat + "," + endPoint.lng + "/car.js?lang=" + this.language + "&units=km");
+		this.$.getRouting.call();
 	}
 });
