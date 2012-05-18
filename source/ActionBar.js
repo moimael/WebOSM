@@ -17,9 +17,9 @@ enyo.kind({
 		},
 		{icon: "images/menu-icon-mylocation.png", onclick: "doMyLocationRequested"},
 		{name: "searchInput", kind: "enyo.ToolSearchInput", flex: 1, onkeypress: "searchInputKeypress"},
-		{name: "startPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("Start point"), showing: false},
+		{name: "startPointInput", kind: "enyo.ToolInput", flex: 3, hint: $L("Start point"), showing: false},
 		{name: "switchInputIcon", icon: "images/menu-icon-swap.png", onclick: "switchInputsContent", showing: false},
-		{name: "endPointInput", kind: "enyo.ToolInput", flex: 4, hint: $L("End point"), showing: false},
+		{name: "endPointInput", kind: "enyo.ToolInput", flex: 3, hint: $L("End point"), showing: false},
 		{name: "routingOkButton", kind: "enyo.ActivityButton", flex: 1, className: "enyo-button-blue", caption: "OK", showing: false, onclick: "routingOkClicked"},
 		{icon: "images/menu-icon-info.png", onclick: "showBaseTileMenu"},
 		{name: "baseTileMenu", kind: "enyo.Menu", defaultKind: "MenuCheckItem", components: [
